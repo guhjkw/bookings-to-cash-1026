@@ -1,0 +1,650 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bookings to cash · live demo</title>
+<meta name="description" content="Live demo for tour and activity operators on Bookeo, Xero and OSB PayZen: every booking matched to its invoice and payments each morning, exceptions shown with one-click fixes, reminders drafted in French or English. Invented company, real working logic.">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#05090c;--s1:#0c1419;--s2:#121c22;--s3:#19262e;
+  --line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.13);--line3:rgba(255,255,255,.22);
+  --text:#eef6f8;--muted:#a3b6bd;--faint:#69808a;
+  --acc:#22d3ee;--acc2:#a5f3fc;--accInk:#042f37;--accSoft:rgba(34,211,238,.12);--accLine:rgba(34,211,238,.42);
+  --gold:#e7b84a;--goldSoft:rgba(231,184,74,.12);
+  --ok:#34d399;--warn:#fbbf24;--bad:#fb7185;
+  --r:20px;--r2:14px;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  /* the app window: a light inventory app */
+  --a-bg:#f6f5f3;--a-panel:#ffffff;--a-line:#e6e2dc;--a-line2:#d6d0c7;--a-text:#1d1a17;--a-muted:#6b6259;--a-side:#1d2230;--a-sideText:#c9cfdb;
+  --a-acc:#0e7490;--a-accSoft:#e6f6fa;
+  --c-ok:#047857;--c-okBg:#e3f6ee;--c-warn:#a16207;--c-warnBg:#fdf3d7;--c-bad:#b42318;--c-badBg:#fde7e5;--c-info:#1d4ed8;--c-infoBg:#e6eefc;--c-grey:#57534e;--c-greyBg:#efedea;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--acc2);outline-offset:2px;border-radius:6px}
+section[id]{scroll-margin-top:76px}
+.ribbon{background:linear-gradient(90deg,#062a33,#081014 35%,#081014 65%,#062a33);border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.ribbon .wrap{display:flex;gap:10px;align-items:center;justify-content:center;padding-top:9px;padding-bottom:9px;flex-wrap:wrap;text-align:center}
+.ribbon b{color:var(--text)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--acc);box-shadow:0 0 0 4px var(--accSoft);display:inline-block}
+header.nav{position:sticky;top:0;z-index:40;background:rgba(5,9,12,.84);backdrop-filter:saturate(160%) blur(14px);-webkit-backdrop-filter:saturate(160%) blur(14px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:62px;gap:16px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(140deg,#a5f3fc,#0891b2 60%,#155e75);display:grid;place-items:center;color:#042f37;font-weight:900}
+.wm{font-weight:780;letter-spacing:-.02em;font-size:17px;line-height:1}
+.wm small{display:block;font-size:10px;letter-spacing:.24em;color:var(--faint);font-weight:650;margin-top:5px}
+.links{display:flex;gap:22px;font-size:14.5px;color:var(--muted)}
+.links a{text-decoration:none}.links a:hover{color:var(--text)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:12px;padding:10px 16px;font-weight:700;font-size:14.5px;border:1px solid var(--line2);background:var(--s2);text-decoration:none;white-space:nowrap}
+.btn.pri{background:linear-gradient(180deg,var(--acc2),var(--acc));color:var(--accInk);border-color:transparent}
+.btn.sm{padding:7px 11px;font-size:13px;border-radius:10px}
+.hero{position:relative;padding:38px 0 10px;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:-30% -10% auto -10%;height:700px;background:radial-gradient(600px 340px at 12% 20%,rgba(34,211,238,.14),transparent 70%),radial-gradient(520px 320px at 92% 0%,rgba(231,184,74,.08),transparent 70%);pointer-events:none}
+.hero .wrap{position:relative;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:40px;align-items:end}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:var(--accSoft);color:var(--acc2);font-size:13px;font-weight:650;border:1px solid var(--accLine)}
+h1{font-size:clamp(30px,4vw,50px);line-height:1.06;letter-spacing:-.035em;margin:14px 0 12px;font-weight:820}
+h1 .hl{background:linear-gradient(100deg,var(--acc2),var(--acc) 60%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:17px;color:var(--muted);max-width:680px;margin:0}
+.lede b{color:var(--text);font-weight:650}
+.benefits{display:grid;gap:10px}
+.ben{display:flex;gap:13px;align-items:flex-start;padding:13px 15px;border-radius:var(--r2);background:var(--s1);border:1px solid var(--line)}
+.ben i{flex:none;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:var(--accSoft);color:var(--acc);font-style:normal;font-size:15px;font-weight:800}
+.ben b{display:block;font-size:15px}
+.ben span{color:var(--muted);font-size:13.5px;line-height:1.45}
+.trybreak{margin:18px 0 0;font-size:14px;color:var(--muted)}
+.trybreak b{color:var(--acc2)}
+
+/* ---------- the app window ---------- */
+.app{margin:20px 0 0;border-radius:18px;overflow:hidden;border:1px solid var(--line2);box-shadow:0 50px 110px -50px rgba(0,0,0,.95),0 0 0 6px #08141a;background:var(--a-bg);color:var(--a-text);color-scheme:light}
+.abar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#ebe7e1;border-bottom:1px solid var(--a-line2);flex-wrap:wrap}
+.lights{display:flex;gap:6px}.lights i{width:11px;height:11px;border-radius:50%;background:#cfc8bf}
+.atitle{font-weight:750;font-size:13.5px;color:#3b342e}
+.atitle small{color:#8a8077;font-weight:600;margin-left:6px}
+.abar .sp{flex:1}
+.abtn{border:1px solid var(--a-line2);background:#fff;color:var(--a-text);border-radius:9px;padding:6px 11px;font-size:13px;font-weight:650}
+.abtn:hover{border-color:#b9b0a5}
+.abtn.pri{background:var(--a-acc);border-color:var(--a-acc);color:#fff}
+.abtn.ok{background:var(--c-ok);border-color:var(--c-ok);color:#fff}
+.abtn[disabled]{opacity:.45;cursor:not-allowed}
+.abody{display:grid;grid-template-columns:200px minmax(0,1fr)}
+.side{background:var(--a-side);color:var(--a-sideText);padding:14px 10px;display:flex;flex-direction:column;gap:3px;min-height:100%}
+.side .co{color:#fff;font-weight:750;font-size:13.5px;padding:4px 8px 12px;line-height:1.3}
+.side .co small{display:block;color:#8d96a8;font-weight:550;font-size:11.5px;margin-top:3px}
+.side button{all:unset;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:8px;font-size:13.5px;font-weight:600}
+.side button:hover{background:rgba(255,255,255,.06);color:#fff}
+.side button[aria-selected="true"]{background:rgba(255,255,255,.1);color:#fff}
+.side button:focus-visible{outline:2px solid #a5f3fc}
+.side .cnt{font:650 11.5px var(--mono);background:rgba(255,255,255,.1);padding:1px 7px;border-radius:999px}
+.side .cnt.bad{background:#7f1d1d;color:#fecaca}
+.side .cnt.ok{background:#064e3b;color:#a7f3d0}
+.side .sep{height:1px;background:rgba(255,255,255,.08);margin:10px 4px}
+.side .note{font-size:11.5px;color:#8d96a8;padding:4px 8px;line-height:1.45}
+.main{min-width:0}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));background:#fff;border-bottom:1px solid var(--a-line)}
+.kpi{padding:11px 14px;border-right:1px solid var(--a-line)}
+.kpi:last-child{border-right:0}
+.kpi b{display:block;font:760 21px/1.15 var(--mono);letter-spacing:-.02em}
+.kpi span{display:block;font-size:11.5px;color:var(--a-muted);font-weight:600;margin-top:2px;line-height:1.3}
+.kpi.flash b{animation:flash 1s ease}
+@keyframes flash{0%{color:var(--a-acc)}100%{color:inherit}}
+.cols{display:grid;grid-template-columns:330px minmax(0,1fr);min-height:560px}
+.left{border-right:1px solid var(--a-line);background:#fbfaf8;padding:14px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.right{padding:14px 16px;min-width:0}
+.card{background:#fff;border:1px solid var(--a-line);border-radius:12px;padding:12px}
+.card h3{margin:0 0 8px;font-size:13px;letter-spacing:.02em;text-transform:uppercase;color:#6b6259}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--a-muted);font-weight:600}
+.field input,.field select,.fix input,.fix select{border:1px solid var(--a-line2);border-radius:8px;padding:6px 8px;background:#fff;color:var(--a-text);font-size:13.5px;min-width:0}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.err{color:var(--c-bad);font-size:12.5px;font-weight:600;margin-top:6px;min-height:0}
+.err:empty{display:none}
+.fixes{display:flex;flex-direction:column;gap:8px}
+.fix{border:1px solid var(--a-line);border-radius:10px;padding:9px 10px;background:#fff;font-size:13px}
+.fix .what{font-weight:700}
+.fix .why{color:var(--a-muted);font-size:12.5px;margin:2px 0 7px}
+.fix .row{gap:6px}
+.fix input{width:150px}
+.fix.done{background:var(--c-okBg);border-color:#a7dcc6}
+.fixdone{color:var(--c-ok);font-weight:700;font-size:13px}
+.tabh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:2px 0 10px;flex-wrap:wrap}
+.tabh h2{margin:0;font-size:17px;letter-spacing:-.01em}
+.tabh p{margin:0;color:var(--a-muted);font-size:13px}
+.seg{display:inline-flex;border:1px solid var(--a-line2);border-radius:9px;overflow:hidden}
+.seg button{border:0;background:#fff;padding:5px 10px;font-size:12.5px;font-weight:650;color:var(--a-muted)}
+.seg button[aria-pressed="true"]{background:var(--a-text);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;color:#7b7168;font-weight:700;padding:7px 8px;border-bottom:1px solid var(--a-line2);background:#faf9f7;position:sticky;top:0}
+td{padding:8px;border-bottom:1px solid var(--a-line);vertical-align:top}
+tr.sel td{background:#f0fafc}
+.tablewrap{max-height:520px;overflow:auto;border:1px solid var(--a-line);border-radius:10px;background:#fff}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap;line-height:1.5}
+.chip.ok{background:var(--c-okBg);color:var(--c-ok)}
+.chip.warn{background:var(--c-warnBg);color:var(--c-warn)}
+.chip.bad{background:var(--c-badBg);color:var(--c-bad)}
+.chip.info{background:var(--c-infoBg);color:var(--c-info)}
+.chip.grey{background:var(--c-greyBg);color:var(--c-grey)}
+.lines{display:flex;flex-direction:column;gap:3px;margin-top:4px}
+.ln{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12.5px}
+.ln code{font:600 12px var(--mono);background:#f3f0ec;border-radius:5px;padding:1px 5px}
+.reason{color:var(--c-bad);font-size:12px;margin-top:3px}
+.why2{color:var(--a-muted);font-size:12px;margin-top:3px}
+.timeline{display:flex;flex-direction:column;gap:0;border:1px solid var(--a-line);border-radius:10px;background:#fff;overflow:hidden}
+.tl{display:grid;grid-template-columns:118px 86px minmax(0,1fr) 150px;gap:10px;padding:10px 12px;border-bottom:1px solid var(--a-line);align-items:baseline;font-size:13.5px}
+.tl:last-child{border-bottom:0}
+.tl .d{font:650 12.5px var(--mono)}
+.tl .o{color:var(--a-muted);font-size:12.5px}
+.tl.switch{background:#f0fafc}
+.phase{font-size:11.5px;font-weight:750;text-transform:uppercase;letter-spacing:.04em}
+.ph-Prepare{color:#1d4ed8}.ph-Freeze{color:#a16207}.ph-Switch{color:#c2410c}.ph-Parallel{color:#047857}.ph-Done{color:#57534e}
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-width:560px}
+.formgrid .full{grid-column:1/-1}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#1d1a17;color:#fff;padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:80;max-width:92vw}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{color:var(--a-muted);font-size:13px;padding:12px}
+.log{font-size:12px;color:var(--a-muted);max-height:120px;overflow:auto}
+.log div{padding:2px 0}
+
+/* ---------- page sections ---------- */
+.sec{padding:64px 0 0}
+.sec h2.big{font-size:clamp(26px,3vw,38px);letter-spacing:-.03em;margin:0 0 10px;line-height:1.1}
+.sec p.sub{color:var(--muted);max-width:760px;margin:0 0 26px;font-size:16.5px}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.step{padding:18px;border-radius:var(--r2);background:var(--s1);border:1px solid var(--line)}
+.step .n{font:800 13px var(--mono);color:var(--acc)}
+.step b{display:block;margin:6px 0 4px;font-size:16px}
+.step span{color:var(--muted);font-size:14px}
+.step.you{border-color:var(--accLine);background:linear-gradient(180deg,rgba(34,211,238,.08),var(--s1))}
+.hood{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+pre.tree{margin:0;padding:16px;border-radius:var(--r2);background:var(--s1);border:1px solid var(--line);font:13px/1.6 var(--mono);color:#c8dde3;overflow:auto}
+.hood p{color:var(--muted);margin:0 0 12px}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.tier{position:relative;display:flex;flex-direction:column;padding:22px;border-radius:var(--r);background:var(--s1);border:1px solid var(--line2)}
+.tier.feat{border:1px solid rgba(231,184,74,.6);background:linear-gradient(180deg,rgba(231,184,74,.09),var(--s1) 40%);box-shadow:0 30px 80px -40px rgba(231,184,74,.35)}
+.badge{position:absolute;top:-12px;left:22px;background:var(--gold);color:#2a1d00;font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.02em}
+.tier h3{margin:0;font-size:18px}
+.price{font:800 34px/1.1 var(--mono);letter-spacing:-.03em;margin:10px 0 2px}
+.price s{font-size:16px;color:var(--faint);font-weight:600;margin-left:8px}
+.tier .for{color:var(--muted);font-size:14px;margin:0 0 12px}
+.tier ul{margin:0 0 14px;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;font-size:14px}
+.tier li{display:flex;gap:8px}
+.tier li:before{content:"✓";color:var(--acc);font-weight:900}
+.tier.feat li:before{color:var(--gold)}
+.tier li.bonus:before{content:"+";color:var(--gold)}
+.ms{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.ms b{color:var(--text)}
+.cta{margin:56px 0 0;padding:30px;border-radius:24px;border:1px solid var(--accLine);background:radial-gradient(500px 220px at 15% 0%,rgba(34,211,238,.15),transparent 70%),var(--s1);display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:26px;align-items:center}
+.cta h2{margin:0 0 8px;font-size:clamp(24px,2.6vw,32px);letter-spacing:-.025em;line-height:1.15}
+.cta p{margin:0;color:var(--muted)}
+.cta .urg{margin-top:10px;font-size:14px;color:var(--acc2)}
+.need{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.need li{padding:10px 12px;border-radius:12px;background:var(--s2);border:1px solid var(--line);font-size:14px}
+.need li b{color:var(--acc2);font-family:var(--mono);margin-right:6px}
+.scope{margin:56px 0 0;padding:22px;border-radius:var(--r2);border:1px solid var(--line);background:var(--s1);color:var(--muted);font-size:14px}
+.scope h3{margin:0 0 8px;color:var(--text);font-size:15px}
+.scope ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px}
+footer{padding:36px 0 50px;color:var(--faint);font-size:13.5px;text-align:center}
+@media (max-width:1100px){
+  .hero .wrap{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .kpi:nth-child(3){border-right:0}
+  .kpi:nth-child(-n+3){border-bottom:1px solid var(--a-line)}
+  .cols{grid-template-columns:1fr}
+  .left{border-right:0;border-bottom:1px solid var(--a-line)}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tiers{grid-template-columns:1fr}
+  .cta,.hood{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .wrap{padding:0 16px}
+  .links{display:none}
+  .abody{grid-template-columns:1fr}
+  .side{flex-direction:row;flex-wrap:wrap;gap:4px;padding:8px}
+  .side .co,.side .sep,.side .note{display:none}
+  .side button{padding:6px 9px;font-size:12.5px}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi{border-right:1px solid var(--a-line)!important;border-bottom:1px solid var(--a-line)}
+  .kpi:nth-child(2n){border-right:0!important}
+  .tl{grid-template-columns:1fr;gap:2px}
+  .steps{grid-template-columns:1fr}
+  .formgrid{grid-template-columns:1fr}
+  .grid3{grid-template-columns:repeat(3,minmax(0,1fr))}
+  table{font-size:12.5px}
+  .hide-m{display:none}
+}
+@media (max-width:760px){
+  .tablewrap{max-height:none;overflow:visible;border:0;background:transparent}
+  .tablewrap table,.tablewrap tbody,.tablewrap tr,.tablewrap td{display:block;width:100%}
+  .tablewrap thead{display:none}
+  .tablewrap tr{background:#fff;border:1px solid var(--a-line);border-radius:12px;margin-bottom:10px;padding:10px 12px}
+  .tablewrap td{border:0;padding:4px 0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* bookings demo additions */
+.who{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.who b{white-space:nowrap}
+.lang{font:700 10.5px var(--mono);padding:1px 5px;border-radius:5px;background:#eef2f4;color:#41545c}
+.amt{font:650 13px var(--mono);white-space:nowrap}
+.acts{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.msgbox{margin-top:12px;border:1px solid var(--a-line);border-radius:12px;background:#fff;padding:12px;font-size:13.5px}
+.msgbox:empty{display:none}
+.msgbox .hd{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:6px;font-size:12.5px;color:var(--a-muted);font-weight:650}
+.msgtext{white-space:pre-wrap;line-height:1.5}
+.rem{border:1px solid var(--a-line);border-radius:12px;background:#fff;padding:12px;display:flex;flex-direction:column;gap:8px}
+.rems{display:flex;flex-direction:column;gap:10px}
+.cashgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.cashcard{border:1px solid var(--a-line);border-radius:12px;background:#fff;padding:12px}
+.cashcard b{display:block;font:760 20px/1.2 var(--mono)}
+.cashcard span{font-size:12.5px;color:var(--a-muted);font-weight:600}
+.today{font:750 18px var(--mono)}
+.chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--a-text);font-weight:500}
+.chk input{margin-top:3px}
+@media (max-width:1100px){.right{order:1}.left{order:2;border-top:1px solid var(--a-line);border-bottom:0}}
+@media (max-width:760px){.cashgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.wm small{display:none}.nav .btn{padding:8px 12px;font-size:13px}}
+</style>
+</head>
+<body>
+<div class="ribbon"><div class="wrap"><span class="dot"></span><span><b>Live tool with invented data.</b> Built around a real setup: Bookeo bookings, Xero invoices and OSB PayZen payment links, joined by Make.</span></div></div>
+<header class="nav"><div class="wrap">
+  <a class="brand" href="#top"><span class="logo">€</span><span class="wm">Bookings to Cash<small>BOOKEO · XERO · PAYZEN</small></span></a>
+  <nav class="links"><a href="#tool">Try it</a><a href="#how">How it works</a><a href="#pricing">Pricing</a><a href="#start">Start</a></nav>
+  <a class="btn pri sm" href="#start">Run it on my bookings</a>
+</div></header>
+
+<main id="top">
+<section class="hero"><div class="wrap">
+  <div>
+    <span class="eyebrow">For tour and activity operators on Bookeo, Xero and PayZen</span>
+    <h1>Every booking paid, <span class="hl">every payment matched.</span></h1>
+    <p class="lede">This is a <b>live tool, not a video</b>. Every morning it lines up each Bookeo booking with its Xero invoice and its PayZen payments, then shows <b>only the bookings that need something</b>: a payment that didn't sync, a link that expired, a customer who paid twice. It drafts each customer message in French or English.</p>
+  </div>
+  <div class="benefits">
+    <div class="ben"><i>1</i><div><b>Catches what slips through</b><span>Paid on PayZen but still open in Xero? Bookeo still says unpaid? You see it the same morning.</span></div></div>
+    <div class="ben"><i>2</i><div><b>Chases unpaid trips for you</b><span>Reminders at 7, 3 and 1 days before the trip, in the customer's language.</span></div></div>
+    <div class="ben"><i>3</i><div><b>One-click fixes</b><span>Mark paid, create the missing invoice, send a new link, record a refund.</span></div></div>
+  </div>
+</div></section>
+
+<section id="tool"><div class="wrap">
+  <p class="trybreak">Try to break it: <b>let a customer pay with the sync switched off</b>, <b>void an invoice before refunding</b>, or <b>book a trip in the past</b>.</p>
+  <div class="app" id="app">
+    <div class="abar">
+      <div class="lights"><i></i><i></i><i></i></div>
+      <div class="atitle">Bookings to cash <small id="coName">Lagon Bleu Excursions, Moorea (invented)</small></div>
+      <div class="sp"></div>
+      <button class="abtn" id="csvBtn" type="button">Download today's list (CSV)</button>
+      <button class="abtn" id="resetBtn" type="button">Reset</button>
+    </div>
+    <div class="abody">
+      <nav class="side" role="tablist" aria-label="Views">
+        <div class="co">Lagon Bleu Excursions<small>Bookeo · Xero · PayZen</small></div>
+        <button role="tab" aria-selected="true" data-tab="need">Needs action <span class="cnt" id="cntNeed">0</span></button>
+        <button role="tab" aria-selected="false" data-tab="reminders">Reminders due <span class="cnt" id="cntRem">0</span></button>
+        <button role="tab" aria-selected="false" data-tab="all">All bookings <span class="cnt" id="cntAll">0</span></button>
+        <button role="tab" aria-selected="false" data-tab="cash">Cash</button>
+        <button role="tab" aria-selected="false" data-tab="add">Add a booking</button>
+        <div class="sep"></div>
+        <div class="note">Every status here is computed from the bookings, invoices and payments on screen. Change anything and it re-runs.</div>
+      </nav>
+      <div class="main">
+        <div class="kpis" id="kpis">
+          <div class="kpi" data-k="trips"><b>–</b><span>Trips in the next 14 days</span></div>
+          <div class="kpi" data-k="paid"><b>–</b><span>Of their value already paid</span></div>
+          <div class="kpi" data-k="unpaid"><b>–</b><span>Unpaid on upcoming trips</span></div>
+          <div class="kpi" data-k="need"><b>–</b><span>Bookings that need something</span></div>
+          <div class="kpi" data-k="rem"><b>–</b><span>Reminders due today</span></div>
+          <div class="kpi" data-k="refund"><b>–</b><span>Refunds due</span></div>
+        </div>
+        <div class="cols">
+          <aside class="left">
+            <div class="card">
+              <h3>Today</h3>
+              <div class="today" id="todayLbl">–</div>
+              <div class="row" style="margin-top:8px"><button class="abtn" type="button" id="nextDay">Next day →</button><button class="abtn" type="button" id="nextWeek">+7 days</button></div>
+            </div>
+            <div class="card">
+              <h3>Rules</h3>
+              <label class="field">Remind this many days before the trip<input id="rDays" placeholder="7, 3, 1"></label>
+              <label class="field" style="margin-top:8px">Count as paid if short by up to (XPF)<input id="rTol" type="number" min="0" max="1000" step="50"></label>
+              <div class="row" style="margin-top:8px"><button class="abtn pri" type="button" id="rApply">Apply</button></div>
+              <div class="err" id="ruleErr" role="alert"></div>
+            </div>
+            <div class="card">
+              <h3>Payment simulator</h3>
+              <label class="chk"><input type="checkbox" id="syncFail"> When a customer pays, make the sync to Xero and Bookeo fail (to see the checker catch it)</label>
+            </div>
+            <div class="card">
+              <h3>What changed</h3>
+              <div class="log" id="log"><div>Nothing yet.</div></div>
+            </div>
+          </aside>
+          <div class="right">
+            <div class="err" id="actErr" role="alert" style="margin:0 0 8px"></div>
+            <div data-pane="need">
+              <div class="tabh"><h2>Needs action</h2><p id="needSum"></p></div>
+              <div class="tablewrap"><table><thead><tr><th>Booking</th><th>Trip</th><th>Status</th><th>Do</th></tr></thead><tbody id="needBody"></tbody></table></div>
+            </div>
+            <div data-pane="reminders" hidden>
+              <div class="tabh"><h2>Reminders due today</h2><p>Drafted in each customer's language. Switch language to check the wording.</p></div>
+              <div class="rems" id="rems"></div>
+            </div>
+            <div data-pane="all" hidden>
+              <div class="tabh"><h2>All bookings</h2><p>Use "Customer pays" to see what happens when a payment lands.</p></div>
+              <div class="tablewrap"><table><thead><tr><th>Booking</th><th>Trip</th><th>Status</th><th>PayZen links</th></tr></thead><tbody id="allBody"></tbody></table></div>
+            </div>
+            <div data-pane="cash" hidden>
+              <div class="tabh"><h2>Cash</h2><p id="cashSum"></p></div>
+              <div class="cashgrid" id="cashGrid"></div>
+              <h3 style="margin:16px 0 8px;font-size:14px">Unpaid trips in the next 7 days</h3>
+              <div class="tablewrap"><table><thead><tr><th>Trip</th><th>Customer</th><th>Still to pay</th></tr></thead><tbody id="weekBody"></tbody></table></div>
+            </div>
+            <div data-pane="add" hidden>
+              <div class="tabh"><h2>Add a booking</h2><p>This does what the existing automation does: the Xero invoice and the PayZen link are created with it.</p></div>
+              <form id="bForm" class="formgrid" novalidate>
+                <label class="field">Customer<input id="bName" autocomplete="off" placeholder="e.g. Hanna Berg"></label>
+                <label class="field">Email<input id="bEmail" autocomplete="off" placeholder="name@example.com"></label>
+                <label class="field">Activity<select id="bAct"></select></label>
+                <label class="field">Language<select id="bLang"><option value="fr">Français</option><option value="en">English</option></select></label>
+                <label class="field">Guests<input id="bPax" type="number" min="1" max="20" step="1" value="2"></label>
+                <label class="field">Trip date<input id="bDate" type="date"></label>
+                <div class="full row"><button class="abtn pri" type="submit" id="bAdd">Add booking</button><span class="why2" id="bHint"></span></div>
+                <div class="err full" id="bErr" role="alert"></div>
+              </form>
+            </div>
+            <div class="msgbox" id="msgbox"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="sec" id="how"><div class="wrap">
+  <h2 class="big">How it works</h2>
+  <p class="sub">Your Bookeo, Xero and PayZen flow keeps running as it does today. This sits on top, checks it every morning, and fixes what slipped.</p>
+  <div class="steps">
+    <div class="step you"><span class="n">01 · YOU</span><b>Give read access</b><span>Bookeo, Xero and PayZen, plus the Make scenarios that already join them.</span></div>
+    <div class="step"><span class="n">02</span><b>Matched every morning</b><span>Each booking lined up with its invoice and every payment on it, refunds included.</span></div>
+    <div class="step"><span class="n">03</span><b>Only exceptions shown</b><span>Sync failures, expired or refused links, part payments, double payments and cancellations with money attached.</span></div>
+    <div class="step"><span class="n">04</span><b>Fixed in one click</b><span>Updates go back to Xero and Bookeo, and customers get their message in French or English.</span></div>
+  </div>
+</div></section>
+
+<section class="sec"><div class="wrap hood">
+  <div>
+    <h2 class="big">Under the hood</h2>
+    <p>The checker is one logic file. The page you just used and <b>66</b> automated checks both load that same file, so what the tests prove is what you clicked. Hand <span class="mono">src/</span> and <span class="mono">tests/</span> to your developer, or never open them.</p>
+    <p>In the paid build the same logic reads Bookeo, Xero and PayZen through their APIs each morning, writes the fixes back, and sends the messages from your address.</p>
+  </div>
+<pre class="tree">bookings-to-cash-1026/
+├── index.html            this page
+├── src/cashEngine.js     matching, statuses, reminders, fixes
+├── data/bookings.json    invented bookings, invoices, payments
+└── tests/
+    ├── verify.js         66 logic checks
+    └── browser-check.py  drives this page in a real browser</pre>
+</div></section>
+
+<section class="sec" id="pricing"><div class="wrap">
+  <h2 class="big">Pick how far to take it</h2>
+  <p class="sub">Fixed prices, one project, no retainer. Every tier starts by running your real bookings through this checker.</p>
+  <div class="tiers">
+    <div class="tier">
+      <h3>Morning report</h3>
+      <div class="price">$950</div>
+      <p class="for">See every exception each morning, fix them yourself.</p>
+      <ul>
+        <li>Bookeo, Xero and PayZen matched every morning</li>
+        <li>Exceptions list emailed before you open</li>
+        <li>Weekly cash summary</li>
+      </ul>
+      <div class="ms">One milestone: <b>$950</b></div>
+    </div>
+    <div class="tier feat">
+      <span class="badge">BEST VALUE</span>
+      <h3>Bookings-to-cash desk</h3>
+      <div class="price">$1,800<s>worth $3,600+</s></div>
+      <p class="for">The checker above, live on your accounts.</p>
+      <ul>
+        <li>Everything in the morning report</li>
+        <li>One-click fixes written back to Xero and Bookeo</li>
+        <li>Reminders at 7, 3 and 1 days, in French or English</li>
+        <li>New links for expired or refused payments</li>
+        <li>Refund and cancellation tracking</li>
+        <li class="bonus">Bonus: your current bookings loaded in for you</li>
+        <li class="bonus">Bonus: walkthrough video for the front desk</li>
+        <li class="bonus">Bonus: 14 days of fixes after go-live</li>
+      </ul>
+      <div class="ms">Milestones: <b>$540</b> matching and checks · <b>$810</b> fixes and reminders · <b>$450</b> go-live</div>
+    </div>
+    <div class="tier">
+      <h3>Desk plus shop</h3>
+      <div class="price">$2,900</div>
+      <p class="for">Adds the WooCommerce side and an owner report.</p>
+      <ul>
+        <li>Everything in the desk</li>
+        <li>WooCommerce orders and gift vouchers matched too</li>
+        <li>Deposits and balances handled as two payments</li>
+        <li>Monthly owner report: paid, owed, refunded by activity</li>
+      </ul>
+      <div class="ms">Milestones: <b>$870</b> · <b>$1,305</b> · <b>$725</b></div>
+    </div>
+  </div>
+
+  <div class="cta" id="start">
+    <div>
+      <h2>Send one month of bookings.</h2>
+      <p>An export from Bookeo plus the matching Xero invoices is enough. I'll run them through this checker and send back what it finds, before you decide anything.</p>
+      <p class="urg" id="urg">Most exceptions show up within a month of bookings, so one export tells you if this is worth it.</p>
+    </div>
+    <ul class="need">
+      <li><b>1</b>A Bookeo bookings export for one month</li>
+      <li><b>2</b>The Xero invoices for the same month</li>
+      <li><b>3</b>A PayZen transaction export</li>
+      <li><b>4</b>Your reminder wording, if you have one</li>
+    </ul>
+  </div>
+
+  <div class="scope">
+    <h3>Honest scope</h3>
+    <ul>
+      <li>Built around a real kind of setup: Bookeo bookings, Xero invoices and OSB PayZen payment links joined by Make.</li>
+      <li>The company, customers, bookings, invoices and payments here are invented. No real client data is shown.</li>
+      <li>The checker logic and its passing checks are real. Bookeo, Xero and PayZen are not connected in this demo, and no message is sent; the delivered build connects to them with access you provide.</li>
+      <li>No prior client build is claimed. This link will be taken down about 30 days after it was sent.</li>
+    </ul>
+  </div>
+</div></section>
+</main>
+
+<footer>Built by Taiwo, Pathfinder Automation Solutions</footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script id="fallback" type="application/json">__FALLBACK__</script>
+<script src="src/cashEngine.js"></script>
+<script>
+(function () {
+  'use strict';
+  const E = window.Cash;
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const M = (n) => E.money(n, 'en');
+  let S = null, lastK = {}, remLang = {};
+
+  async function load() {
+    try { const r = await fetch('data/bookings.json', { cache: 'no-store' }); if (r.ok) return await r.json(); } catch (e) { /* file:// */ }
+    return JSON.parse($('fallback').textContent);
+  }
+  function toast(t) { const el = $('toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2400); }
+  function setErr(id, list) { $(id).textContent = (list || []).join(' '); }
+  function showMsg(title, text, lang) {
+    $('msgbox').innerHTML = '<div class="hd"><span>' + esc(title) + '</span><span class="lang">' + esc((lang || '').toUpperCase()) + '</span></div><div class="msgtext">' + esc(text) + '</div>';
+  }
+
+  function start(raw) {
+    const p = E.prepare(raw);
+    if (p.problems.length) console.warn('Data problems:', p.problems);
+    S = E.newState(p.data);
+    remLang = {};
+    $('bAct').innerHTML = S.activities.map((a) => '<option value="' + esc(a.id) + '">' + esc(a.name + ' · ' + M(a.price)) + '</option>').join('');
+    $('bDate').value = E.addDays(S.company.today, 5);
+    $('rDays').value = S.rules.reminderDays.join(', ');
+    $('rTol').value = S.rules.tolerance;
+    ['actErr', 'ruleErr', 'bErr'].forEach((id) => setErr(id, []));
+    $('msgbox').innerHTML = '';
+    render();
+  }
+
+  // ---------- render everything from the engine ----------
+  const LEVEL = { bad: 'bad', warn: 'warn', info: 'info', grey: 'grey', ok: 'ok' };
+  const ACT = {
+    xeroPaid: (r) => 'Mark ' + r.status.facts.inv.number + ' paid in Xero',
+    bookeoPaid: () => 'Mark paid in Bookeo',
+    createInvoice: () => 'Create invoice in Xero',
+    newLink: () => 'Send a new PayZen link',
+    balanceLink: (r) => 'Send link for ' + M(r.status.facts.due),
+    remind: () => 'Send reminder',
+    refund: (r) => 'Record refund of ' + M(r.status.facts.net),
+    refundExtra: (r) => 'Record refund of ' + M(r.status.facts.net - r.booking.amount),
+    void: (r) => 'Void ' + r.status.facts.inv.number + ' in Xero'
+  };
+  function render() {
+    const b = E.board(S), c = E.cash(S), rem = E.remindersDue(S);
+    window.__demo.last = { b, c, rem };
+    kpi('trips', String(c.trips));
+    kpi('paid', c.paidPct + '%');
+    kpi('unpaid', M(c.unpaidUpcoming));
+    kpi('need', String(b.need.length));
+    kpi('rem', String(rem.length));
+    kpi('refund', M(c.refundsDue));
+    $('cntNeed').textContent = String(b.need.length); $('cntNeed').className = 'cnt ' + (b.need.length ? 'bad' : 'ok');
+    $('cntRem').textContent = String(rem.length);
+    $('cntAll').textContent = String(b.rows.length);
+    $('todayLbl').textContent = E.dayLabel(S.company.today);
+    $('needSum').textContent = b.need.length ? b.need.filter((r) => r.status.level === 'bad').length + ' urgent, ' + b.need.filter((r) => r.status.level === 'warn').length + ' to tidy' : '';
+    $('needBody').innerHTML = b.need.length ? b.need.map(row).join('') : '<tr><td colspan="4" class="empty">Nothing needs you today. Every booking is paid, waiting on a link, or matched.</td></tr>';
+    $('allBody').innerHTML = b.rows.map(allRow).join('');
+    renderReminders(rem);
+    renderCash(c);
+    $('log').innerHTML = S.log.length ? S.log.slice().reverse().map((x) => '<div>• ' + esc(x) + '</div>').join('') : '<div>Nothing yet.</div>';
+  }
+  function kpi(k, v) {
+    const el = document.querySelector('.kpi[data-k="' + k + '"]');
+    const bb = el.querySelector('b');
+    if (bb.textContent !== v) { bb.textContent = v; if (lastK[k] !== undefined) { el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); } }
+    lastK[k] = v;
+  }
+  function who(r) {
+    return '<div class="who"><b class="mono">' + esc(r.booking.id) + '</b><span class="lang">' + r.booking.lang.toUpperCase() + '</span></div><div class="why2">' + esc(r.booking.customer) + '</div>';
+  }
+  function trip(r) {
+    return esc(E.dayLabel(r.booking.tripDate)) + '<div class="why2">' + esc(r.activity.name) + ' · ' + r.booking.pax + ' · <span class="amt">' + M(r.booking.amount) + '</span>' + (r.booking.status === 'cancelled' ? ' · cancelled' : '') + '</div>';
+  }
+  function statusCell(r) {
+    return '<span class="chip ' + LEVEL[r.status.level] + '">' + esc(r.status.label) + '</span><div class="why2">' + esc(r.status.detail) + '</div>';
+  }
+  function row(r) {
+    const a = r.status.action;
+    const btn = a ? '<button class="abtn ' + (r.status.level === 'bad' ? 'pri' : '') + '" type="button" data-act="' + a + '" data-id="' + esc(r.booking.id) + '">' + esc(ACT[a](r)) + '</button>' : '';
+    return '<tr data-id="' + esc(r.booking.id) + '" data-code="' + r.status.code + '"><td>' + who(r) + '</td><td>' + trip(r) + '</td><td>' + statusCell(r) + '</td><td><div class="acts">' + btn + '</div></td></tr>';
+  }
+  function allRow(r) {
+    const links = r.status.facts.pays.map((p) => '<div class="ln"><code>' + esc(p.id) + '</code> ' + M(p.amount) + ' <span class="chip ' + (p.status === 'PAID' ? 'ok' : p.status === 'PENDING' ? 'info' : 'bad') + '">' + p.status.toLowerCase() + '</span>' +
+      (p.status === 'PENDING' ? ' <button class="abtn" type="button" data-pay="' + esc(p.id) + '">Customer pays</button>' : '') + '</div>').join('') || '<span class="why2">No link</span>';
+    return '<tr data-id="' + esc(r.booking.id) + '" data-code="' + r.status.code + '"><td>' + who(r) + '</td><td>' + trip(r) + '</td><td>' + statusCell(r) + '</td><td><div class="lines">' + links + '</div></td></tr>';
+  }
+  function renderReminders(rem) {
+    $('rems').innerHTML = rem.length ? rem.map((x) => {
+      const lang = remLang[x.booking.id] || x.booking.lang;
+      const text = E.message(S, x.booking, x.kind, lang);
+      return '<div class="rem" data-id="' + esc(x.booking.id) + '"><div class="row" style="justify-content:space-between"><div><b class="mono">' + esc(x.booking.id) + '</b> · ' + esc(x.booking.customer) + ' <span class="why2">' + x.stage + '-day stage</span></div>' +
+        '<div class="seg" role="group" aria-label="Language"><button type="button" data-lang="fr" data-id="' + esc(x.booking.id) + '" aria-pressed="' + (lang === 'fr') + '">FR</button><button type="button" data-lang="en" data-id="' + esc(x.booking.id) + '" aria-pressed="' + (lang === 'en') + '">EN</button></div></div>' +
+        '<div class="msgtext">' + esc(text) + '</div><div><button class="abtn pri" type="button" data-act="remind" data-id="' + esc(x.booking.id) + '">Send reminder</button></div></div>';
+    }).join('') : '<div class="empty">No reminders due today. Try "Next day →" to see the next ones arrive.</div>';
+  }
+  function renderCash(c) {
+    $('cashSum').textContent = 'As of ' + E.dayLabel(S.company.today) + '.';
+    const cards = [['Received, last 7 days', M(c.receivedWeek)], ['Unpaid, trips in the next 7 days', M(c.unpaidWeek)], ['Unpaid, all upcoming trips', M(c.unpaidUpcoming)],
+      ['Overdue, trips already done', M(c.overdue)], ['Refunds due', M(c.refundsDue)], ['Paid of the next 14 days', c.paidPct + '% of ' + M(c.tripsValue)]];
+    $('cashGrid').innerHTML = cards.map((x) => '<div class="cashcard"><b>' + esc(x[1]) + '</b><span>' + esc(x[0]) + '</span></div>').join('');
+    const week = S.bookings.map((b) => ({ b, f: E.facts(S, b) })).filter((x) => x.b.status === 'confirmed' && x.f.days >= 0 && x.f.days <= 7 && x.f.due > 0).sort((x, y) => x.b.tripDate.localeCompare(y.b.tripDate));
+    $('weekBody').innerHTML = week.length ? week.map((x) => '<tr><td>' + esc(E.dayLabel(x.b.tripDate)) + '</td><td>' + esc(x.b.customer) + '</td><td class="amt">' + M(x.f.due) + '</td></tr>').join('') : '<tr><td colspan="3" class="empty">Every trip in the next 7 days is paid.</td></tr>';
+  }
+
+  // ---------- interactions ----------
+  function doAct(kind, id) {
+    let res, title = '';
+    if (kind === 'xeroPaid') res = E.markXeroPaid(S, id);
+    else if (kind === 'bookeoPaid') res = E.markBookeoPaid(S, id);
+    else if (kind === 'createInvoice') res = E.createInvoice(S, id);
+    else if (kind === 'newLink' || kind === 'balanceLink') { res = E.sendNewLink(S, id); title = 'Message sent with the new link'; }
+    else if (kind === 'remind') { res = E.sendReminder(S, id, remLang[id]); title = 'Reminder sent'; }
+    else if (kind === 'refund' || kind === 'refundExtra') res = E.recordRefund(S, id);
+    else if (kind === 'void') res = E.voidInvoice(S, id);
+    if (!res || !res.ok) { setErr('actErr', res ? res.problems : ['Unknown action.']); return; }
+    setErr('actErr', []);
+    const b = S.bookings.find((x) => x.id === id);
+    if (res.text) showMsg(title + ' to ' + b.customer, res.text, res.lang || b.lang);
+    render();
+    toast(id + ': ' + E.statusOf(S, b).label);
+  }
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('button[data-act]');
+    if (a) return doAct(a.dataset.act, a.dataset.id);
+    const pay = e.target.closest('button[data-pay]');
+    if (pay) {
+      const res = E.customerPays(S, pay.dataset.pay, $('syncFail').checked);
+      if (!res.ok) { setErr('actErr', res.problems); return; }
+      setErr('actErr', []); render();
+      const p = S.payments.find((x) => x.id === pay.dataset.pay);
+      toast(p.bookingId + ': ' + E.statusOf(S, S.bookings.find((x) => x.id === p.bookingId)).label);
+      return;
+    }
+    const lg = e.target.closest('.rem button[data-lang]');
+    if (lg) { remLang[lg.dataset.id] = lg.dataset.lang; renderReminders(E.remindersDue(S)); }
+  });
+  document.querySelectorAll('.side button[data-tab]').forEach((b) => b.addEventListener('click', () => showTab(b.dataset.tab)));
+  function showTab(t) {
+    document.querySelectorAll('.side button[data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === t)));
+    document.querySelectorAll('[data-pane]').forEach((p) => { p.hidden = p.dataset.pane !== t; });
+  }
+  $('nextDay').addEventListener('click', () => { E.advance(S, 1); render(); toast('Now ' + E.dayLabel(S.company.today)); });
+  $('nextWeek').addEventListener('click', () => { E.advance(S, 7); render(); toast('Now ' + E.dayLabel(S.company.today)); });
+  $('rApply').addEventListener('click', () => {
+    const days = $('rDays').value.split(/[,\s]+/).filter(Boolean).map(Number);
+    const res = E.setRules(S, { reminderDays: days, tolerance: $('rTol').value === '' ? NaN : Number($('rTol').value) });
+    if (!res.ok) { setErr('ruleErr', res.problems); return; }
+    setErr('ruleErr', []); $('rDays').value = S.rules.reminderDays.join(', '); render(); toast('Rules applied.');
+  });
+  $('bForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const res = E.addBooking(S, { customer: $('bName').value, email: $('bEmail').value, activity: $('bAct').value, lang: $('bLang').value, pax: $('bPax').value === '' ? NaN : Number($('bPax').value), tripDate: $('bDate').value });
+    if (!res.ok) { setErr('bErr', res.problems); return; }
+    setErr('bErr', []); $('bName').value = ''; $('bEmail').value = '';
+    render();
+    toast(res.booking.id + ': ' + E.statusOf(S, res.booking).label);
+    showTab('all');
+  });
+  $('resetBtn').addEventListener('click', () => { start(window.__demo.raw); toast('Back to the starting data.'); });
+  $('csvBtn').addEventListener('click', () => {
+    const blob = new Blob([E.csv(S)], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'bookings-to-cash-' + S.company.today + '.csv';
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  });
+
+  window.__demo = { engine: E, state: () => S, last: null, raw: null };
+  load().then((raw) => { window.__demo.raw = raw; start(raw); });
+})();
+</script>
+</body>
+</html>

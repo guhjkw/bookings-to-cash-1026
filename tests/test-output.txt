@@ -1,0 +1,88 @@
+
+1. Data check: bad rows are skipped and reported, never a crash
+  PASS sample data loads with no problems
+  PASS a duplicate booking number is skipped
+  PASS an unknown activity is skipped
+  PASS a trip date that is not a date is skipped
+  PASS a zero amount is skipped
+  PASS an invoice for an unknown booking is skipped
+  PASS a duplicate payment id is skipped
+  PASS a PAID payment with no paid date is skipped
+  PASS a missing "today" falls back and says so
+
+2. Every booking gets the right status
+  PASS all 16 statuses as expected
+  PASS paid on PayZen but open in Xero is caught (BK-24055)
+  PASS a refused card the day before the trip is urgent (BK-24076 is red)
+  PASS an expired link 3 days out is amber (BK-24060)
+  PASS paid twice shows the refund amount (42,000 XPF)
+  PASS a part payment shows the balance (12,000 of 24,000)
+  PASS a trip 17 days out waits, with its first reminder date (Thu 5 Nov)
+
+3. The board and the money
+  PASS 11 bookings need action
+  PASS red items come first, then amber
+  PASS 172,500 XPF received in the last 7 days
+  PASS 232,500 XPF unpaid on upcoming trips, 137,500 of it in the next 7 days
+  PASS 16,500 XPF overdue on a trip already done
+  PASS 61,000 XPF of refunds due
+  PASS 10 trips in the next 14 days, 45% of their value paid
+
+4. Reminders, in the customer's language
+  PASS 2 reminders due today: BK-24058 (3-day stage) and BK-24063 (7-day stage)
+  PASS the French reminder uses the French date and spacing
+  PASS the English reminder uses the English date
+  PASS sending it records the stage and the booking waits
+  PASS the same reminder cannot go twice
+  PASS a booking with nothing due cannot be reminded
+  PASS the English message can be drafted for a French customer on request
+  PASS and sent in English when chosen, which the log records
+
+5. Fixes that write back
+  PASS marking INV-0421 paid moves BK-24055 on to the Bookeo step
+  PASS marking Bookeo paid finishes it
+  PASS an unpaid booking cannot be marked paid in Xero
+  PASS the missing invoice for BK-24064 is created as INV-0439 and it waits
+  PASS a second invoice is refused
+  PASS a new link replaces the expired one and counts as this stage's reminder
+  PASS the new-link message says the link expired
+  PASS for a refused card it says the card was refused, not that the new link failed
+  PASS a second link while one is open is refused
+  PASS voiding before refunding is refused
+  PASS recording the refund leaves the open invoice to void
+  PASS voiding it clears the cancellation
+  PASS refunding the double payment leaves BK-24070 paid and matched
+  PASS no refund on a booking that is fine
+  PASS the balance link is for 12,000 XPF
+  PASS when the customer pays it, the booking is paid and matched
+  PASS every one of the 10 actions is logged
+
+6. Payments that arrive, with and without the sync working
+  PASS a normal payment marks Xero and Bookeo too (BK-24058 is matched at once)
+  PASS a payment whose sync fails is caught as "open in Xero" (BK-24063)
+  PASS an expired link cannot be paid
+
+7. Moving the clock
+  PASS three days on, the unpaid sunset trip of the 28th is overdue
+  PASS on Thu 5 Nov the dive on the 12th reaches its 7-day reminder
+  PASS moving 0 or 40 days is refused
+
+8. Adding a booking (what the existing automation does)
+  PASS name, email, activity, guests and a past date are all refused
+  PASS a valid booking gets BK-24077, INV-0439 and link PZ-88232
+  PASS its amount is the activity price times guests (33,000 XPF)
+  PASS a trip in 3 days is due its reminder straight away
+
+9. Tunable rules
+  PASS reminder days 14 and 2 are accepted and sorted
+  PASS with a 14-day stage, the whale trip 7 days out counts against the 14-day reminder
+  PASS with one 5-day reminder it waits instead, first reminder Wed 28 Oct
+  PASS repeated, zero or 40-day reminders are refused
+  PASS a payment 50 XPF short is a part payment with no tolerance
+  PASS with a 100 XPF tolerance it counts as paid (and the open invoice shows)
+
+10. Export
+  PASS CSV has a header and 16 bookings
+  PASS fields with commas are quoted
+
+66 checks: 66 passed, 0 failed
